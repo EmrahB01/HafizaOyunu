@@ -1,0 +1,113 @@
+package Oyun;
+import java.awt.Component;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class Card extends JLabel implements MouseListener
+{
+	TurnedCardManager turnedManager;
+	Icon onYuz;
+	Icon arkaYuz;
+	boolean faceUp = false; 			// Başlangıçta kart kapalı
+	int num; 							
+	int iconWidthHalf, iconHeightHalf; 	
+	boolean mousePressedOnMe = false;
+	
+	
+	
+	public Card(TurnedCardManager turnedManager, Icon ön, Icon arka, int num)
+	{
+		// Başlangıçta kartın arkasını göster
+		super(arka);
+		
+		this.turnedManager = turnedManager;
+		this.onYuz = ön;
+		this.arkaYuz = arka;
+		this.num = num;
+		// Mouse Tiklerini almak için:
+		this.addMouseListener(this);
+		
+		this.iconWidthHalf = arka.getIconWidth() / 2;
+		this.iconHeightHalf = arka.getIconHeight() / 2;
+	}
+		
+	
+	public void turnUp()
+	{
+		
+		 
+		// Kart Zaten açıksa 
+		if(this.faceUp) return;
+		// kartın dönmesi için izin
+		this.faceUp = this.turnedManager.turnUp(this);
+		// Kart Döndürüldü resmi değiştir
+		if(this.faceUp) this.setIcon(this.onYuz);
+	}
+	
+	
+	public void turnDown()
+	{
+		
+		// Kart zaten kapalı
+		if(!this.faceUp) return;
+		// Resmi değiştir
+		this.setIcon(this.arkaYuz);
+		//Kart şimdi kapalı
+		this.faceUp = false;
+	}
+	
+	
+	public int getNum() { return num; }
+	
+	
+	private boolean overIcon(int x, int y)
+	{
+		// Hesaplama
+		int distX = Math.abs(x - (this.getWidth() / 2));
+		int distY = Math.abs(y - (this.getHeight() / 2));
+		// Dış simge bölgesi
+		if(distX > this.iconWidthHalf || distY > this.iconHeightHalf )
+			return false;
+		// İç simge bölgesi
+		return true;
+	}
+	
+	
+	public void mouseClicked(MouseEvent e)
+	{
+		// Mouse Simgenin üstünde kartı aç
+		if(overIcon(e.getX(), e.getY())) this.turnUp();
+	}
+	
+	
+	public void mousePressed(MouseEvent e)
+	{
+		// Mouse tikini al
+		if(overIcon(e.getX(), e.getY())) this.mousePressedOnMe = true;
+	}
+	
+	
+	public void mouseReleased(MouseEvent e)
+	{
+		if(this.mousePressedOnMe)
+		{
+			//Mouse artık basılı değil
+			this.mousePressedOnMe = false;
+			// Mouse Tiki
+			this.mouseClicked(e);
+		}
+		
+	}
+	
+	public void mouseEntered(MouseEvent e) {}
+	
+	
+	public void mouseExited(MouseEvent e)
+	{
+		// Önceki Mouse Tiklerini unut
+		this.mousePressedOnMe = false;
+	}
+		
+	
+    
+}
